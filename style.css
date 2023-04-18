@@ -1,0 +1,38 @@
+html {
+    font-size: 1.5vw;
+}
+
+body {
+    background: #4a463d;
+}
+
+.keyboard {
+    display: grid;
+    grid-template-rows: 3vw repeat(4, 4vw);
+    max-width: 70%;
+    margin: 0 auto;
+    padding: 30px;
+    gap: 0.3rem;
+    background: #d2d2d2;
+    border-radius: 1rem;
+}
+
+.row {
+    display: flex;
+    gap: 0.3rem;
+}
+
+.key {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 0.3rem;
+    background: #a8a9ae;
+    height: 100%;
+    flex-basis: 0.8rem;
+    padding: 0 1rem;
+}
+
+.key-no-size {
+    flex-grow: 0.5;
+}
