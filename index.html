@@ -9,8 +9,24 @@
 </head>
 <body>
     <div class="keyboard">
-        <div class="row esc-row">
-            <div class="key">Esc</div>
+        <div class="row escape-row">
+            <div class="key">ESC</div>
+            <div class="key">F1</div>
+            <div class="key">F2</div>
+            <div class="key">F3</div>
+            <div class="key">F4</div>
+            <div class="key">F5</div>
+            <div class="key">F6</div>
+            <div class="key">F7</div>
+            <div class="key">F8</div>
+            <div class="key">F9</div>
+            <div class="key">F10</div>
+            <div class="key">F11</div>
+            <div class="key">F12</div>
+            <div class="key key-no-size key-right">Delete</div>
+        </div>
+        <div class="row number-row">
+            <div class="key">`</div>
             <div class="key">1</div>
             <div class="key">2</div>
             <div class="key">3</div>
@@ -23,10 +39,10 @@
             <div class="key">0</div>
             <div class="key">-</div>
             <div class="key">+</div>
-            <div class="key key-no-size">Backspace</div>
+            <div class="key key-no-size key-right">Backspace</div>
         </div>
         <div class="row tab-row">
-            <div class="key key-no-size">Tab</div>
+            <div class="key key-no-size key-left">Tab</div>
             <div class="key">Q</div>
             <div class="key">W</div>
             <div class="key">E</div>
@@ -42,7 +58,7 @@
             <div class="key">\</div>
         </div>
         <div class="row caps-row">
-            <div class="key key-no-size">Caps</div>
+            <div class="key key-no-size key-left">Caps</div>
             <div class="key">A</div>
             <div class="key">S</div>
             <div class="key">D</div>
@@ -54,10 +70,10 @@
             <div class="key">L</div>
             <div class="key">;</div>
             <div class="key">'</div>
-            <div class="key key-no-size">Enter</div>
+            <div class="key key-no-size key-right">Enter</div>
         </div>
         <div class="row shift-row">
-            <div class="key key-no-size">Shift</div>
+            <div class="key key-no-size key-left">Shift</div>
             <div class="key">Z</div>
             <div class="key">X</div>
             <div class="key">C</div>
@@ -68,17 +84,21 @@
             <div class="key">&lt;</div>
             <div class="key">&gt;</div>
             <div class="key">/</div>
-            <div class="key key-no-size">Shift</div>
+            <div class="key key-no-size key-right">Shift</div>
         </div>
         <div class="row ctrl-row">
-            <div class="key">Ctrl</div>
-            <div class="key">Win</div>
+            <div class="key key-no-size key-left">Ctrl</div>
+            <div class="key key-no-size">Win</div>
             <div class="key">Alt</div>
-            <div class="key key-no-size">Space</div>
+            <div class="key key-space"></div>
             <div class="key">Alt</div>
-            <div class="key">Win</div>
-            <div class="key">CM</div>
-            <div class="key">Ctrl</div>
+            <div class="key key-no-size">Ctrl</div>
+            <div class="key">&larr;</div>
+            <div class="arrows-vertical-container">
+                <div class="key arrows-vertical">&uarr;</div>
+                <div class="key arrows-vertical">&darr;</div>
+            </div>
+            <div class="key">&rarr;</div>
         </div>
     </div>
 <script src="./main.js"></script>
