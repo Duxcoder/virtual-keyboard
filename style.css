@@ -105,7 +105,7 @@ text-transform: uppercase;
   min-width: 1rem;
   padding: 0 1rem;
   transform: translateY(0px);
-  transition: 0.3s;
+  transition: 0.1s;
   box-shadow: 0 0.2rem 0 0 rgb(107 107 107 / 70%);
   color: #fff;
   cursor: pointer;

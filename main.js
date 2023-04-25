@@ -9,6 +9,7 @@ const createDomElement = (tag, className) => {
 class Keyboard {
   constructor() {
     this.$app = null;
+    this.$workArea = null;
   }
   renderWrapper($parent) {
     const $app = createDomElement('section', 'app');
@@ -25,6 +26,7 @@ class Keyboard {
   renderWorkArea(content) {
     const $workArea = createDomElement('div', 'work-area');
     $workArea.innerHTML = content;
+    this.$workArea = $workArea
     this.$app.append($workArea);
   }
 
@@ -42,7 +44,9 @@ const keyboard = new Keyboard();
 keyboard.renderWrapper(document.body);
 keyboard.renderTitle('VIRTUAL KEYBOARD');
 
-const $textArea = '<textarea name="keyboard-text" id="textarea" rows="4"></textarea>';
+// const $textArea = createDomElement('div', 'class');
+const $textArea = '<textarea name="keyboard-text" id="textarea" rows="4"></textarea>'
+// const $description = createDomElement('div', 'class')
 const $description = `<div class="description">
 <span class="title-desctiption">Description</span>
 <ul class="description-list">
@@ -66,27 +70,60 @@ class KeyboardKeys {
   constructor() {
     this.language = 'eng';
     this.keys = {};
+    this.keyPressed = {};
   }
   async getKeys() {
     const response = await fetch("./keys.json");
     const data = await response.json();
     return data
   }
-  start(lang='eng') {
+  changeLang(lang = 'eng') {
     this.language = lang;
-    this.keys = {}
+    for (let row in this.keys) {
+      this.keys[row].forEach(key => {
+        const labelKey = key[0][1][this.language];
+        const textKey = Array.isArray(labelKey) ? `${labelKey[0]} <span>${labelKey[1]}</span>` : labelKey
+        key[1].innerHTML = textKey;
+      })
+    }
+
   }
   connectionWithKeyboard() {
     document.addEventListener('keydown', (e) => {
-      console.log(e.code, e.keyCode)
-      for (let row in this.keys){
+      const changeLang = keyboardKeys.language === 'rus' ? 'eng' : 'rus'
+    //  if (e.code === 'KeyZ') keyboardKeys.changeLang('eng');
+      keyboard.$workArea.firstChild.focus();
+      if (!this.keyPressed[e.key]) {
+        this.keyPressed[e.key] = true;
+     if (this.keyPressed['Shift'] && this.keyPressed['Alt']) keyboardKeys.changeLang(changeLang);
+        for (let row in this.keys) {
+          this.keys[row].forEach(key => {
+            if (e.code === key[0][0]) {
+              key[1].classList.add('touch');
+            }
+          })
+        }
+      }
+
+    })
+    document.addEventListener('keyup', (e) => {
+      this.keyPressed[e.key] = false;
+      for (let row in this.keys) {
         this.keys[row].forEach(key => {
-          if (e.code === key[0][0]){
-            key[1].classList.toggle('touch');
+          if (e.code === key[0][0]) {
+            key[1].classList.remove('touch');
           }
         })
       }
     })
+    keyboard.$workArea.addEventListener('focusout', (e) => {
+      this.keyPressed = {};
+      for (let row in this.keys) {
+        this.keys[row].forEach(key => {
+          key[1].classList.remove('touch');
+        })
+      }
+    });
   }
   async createRow(rowName, classRow) {
     const isVerticalArrow = (key) => key.classList.contains('arrows-vertical');
@@ -113,10 +150,10 @@ class KeyboardKeys {
   }
 }
 
+const keyboardKeys = new KeyboardKeys();
 
 async function addRows(rows) {
   let $rows = [];
-  const keyboardKeys = new KeyboardKeys();
   for (const [rowName, classRow] of rows) {
     const row = await keyboardKeys.createRow(rowName, classRow);
     $rows.push(row);
