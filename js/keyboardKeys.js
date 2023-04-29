@@ -1,9 +1,5 @@
 import createDomElement from './assets.js';
 
-function isMultikey(key) {
-  return Array.isArray(key);
-}
-
 function renderToArea(textArea, renderKeyValue) {
   const $textArea = textArea;
   $textArea.textContent += renderKeyValue;
@@ -17,6 +13,7 @@ class KeyboardKeys {
     this.keys = {};
     this.keyPressed = {};
     this.shift = 0;
+    this.caps = 0;
   }
 
   async getKeys() {
@@ -48,6 +45,30 @@ class KeyboardKeys {
     }
   }
 
+  multikey(valuesKey) {
+    return Array.isArray(valuesKey) ? valuesKey[this.shift] : valuesKey;
+  }
+
+  doShift(valueKey) {
+    let renderKey = valueKey;
+    if (valueKey === 'shift') {
+      this.shift = 1;
+      return '';
+    }
+    renderKey = this.shift ? renderKey.toUpperCase() : renderKey;
+    return renderKey;
+  }
+
+  doCaps(valueKey) {
+    let renderKey = valueKey;
+    if (valueKey === 'caps lock') {
+      this.caps = 1;
+      return '';
+    }
+    renderKey = this.caps ? renderKey.toUpperCase() : renderKey;
+    return renderKey;
+  }
+
   keydown($workArea) {
     const $textArea = $workArea.firstChild;
     document.addEventListener('keydown', (e) => {
@@ -59,17 +80,11 @@ class KeyboardKeys {
         this.doSmthWithKey((key) => {
           if (e.code === key[0][0]) {
             key[1].classList.add('touch');
-            let valuesKey = key[0][1][this.language];
+            const valuesKey = key[0][1][this.language];
             let renderKeyValue = '';
-            if (valuesKey === 'shift') {
-              this.shift = 1;
-              valuesKey = '';
-            }
-            if (isMultikey(valuesKey)) {
-              renderKeyValue = valuesKey[this.shift];
-            } else {
-              renderKeyValue = this.shift ? valuesKey.toUpperCase() : valuesKey;
-            }
+            renderKeyValue = this.multikey(valuesKey);
+            renderKeyValue = this.doShift(renderKeyValue);
+            renderKeyValue = this.doCaps(renderKeyValue);
             renderToArea($textArea, renderKeyValue);
           }
         });
@@ -86,6 +101,9 @@ class KeyboardKeys {
           key[1].classList.remove('touch');
           if (valuesKey === 'shift') {
             this.shift = 0;
+          }
+          if (valuesKey === 'caps lock') {
+            this.caps = 0;
           }
         }
       });
