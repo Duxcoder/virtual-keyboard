@@ -1,11 +1,22 @@
 import createDomElement from './assets.js';
 
+function isMultikey(key) {
+  return Array.isArray(key);
+}
+
+function renderToArea(textArea, renderKeyValue) {
+  const $textArea = textArea;
+  $textArea.textContent += renderKeyValue;
+  $textArea.selectionEnd = $textArea.textContent.length + renderKeyValue.length;
+  $textArea.selectionStart = $textArea.textContent.length + renderKeyValue.length;
+}
 class KeyboardKeys {
   constructor() {
     this.language = 'eng';
     this.dataKeys = null;
     this.keys = {};
     this.keyPressed = {};
+    this.shift = 0;
   }
 
   async getKeys() {
@@ -15,10 +26,18 @@ class KeyboardKeys {
     return data;
   }
 
-  changeLang(lang = 'eng') {
-    this.language = lang;
+  doSmthWithKey(callback) {
     Object.values(this.keys).forEach((rowKeys) => {
-      rowKeys.forEach((item) => {
+      rowKeys.forEach((key) => {
+        callback(key);
+      });
+    });
+  }
+
+  changeLang(key1, key2) {
+    if (key1 && key2) {
+      this.language = this.language === 'rus' ? 'eng' : 'rus';
+      this.doSmthWithKey((item) => {
         const key = item;
         const labelKey = key[0][1][this.language];
         const textKey = Array.isArray(labelKey)
@@ -26,41 +45,66 @@ class KeyboardKeys {
           : labelKey;
         key[1].innerHTML = textKey;
       });
+    }
+  }
+
+  keydown($workArea) {
+    const $textArea = $workArea.firstChild;
+    document.addEventListener('keydown', (e) => {
+      e.preventDefault();
+      $textArea.focus();
+      if (!this.keyPressed[e.key]) {
+        this.keyPressed[e.key] = true;
+        this.changeLang(this.keyPressed.Shift, this.keyPressed.Alt);
+        this.doSmthWithKey((key) => {
+          if (e.code === key[0][0]) {
+            key[1].classList.add('touch');
+            let valuesKey = key[0][1][this.language];
+            let renderKeyValue = '';
+            if (valuesKey === 'shift') {
+              this.shift = 1;
+              valuesKey = '';
+            }
+            if (isMultikey(valuesKey)) {
+              renderKeyValue = valuesKey[this.shift];
+            } else {
+              renderKeyValue = this.shift ? valuesKey.toUpperCase() : valuesKey;
+            }
+            renderToArea($textArea, renderKeyValue);
+          }
+        });
+      }
+    });
+  }
+
+  keyup() {
+    document.addEventListener('keyup', (e) => {
+      this.keyPressed[e.key] = false;
+      this.doSmthWithKey((key) => {
+        const valuesKey = key[0][1][this.language];
+        if (e.code === key[0][0]) {
+          key[1].classList.remove('touch');
+          if (valuesKey === 'shift') {
+            this.shift = 0;
+          }
+        }
+      });
+    });
+  }
+
+  focusout($workArea) {
+    $workArea.addEventListener('focusout', () => {
+      this.keyPressed = {};
+      this.doSmthWithKey((key) => {
+        key[1].classList.remove('touch');
+      });
     });
   }
 
   connectionWithKeyboard($workArea) {
-    document.addEventListener('keydown', (e) => {
-      const changeLang = this.language === 'rus' ? 'eng' : 'rus';
-      $workArea.firstChild.focus();
-      if (!this.keyPressed[e.key]) {
-        this.keyPressed[e.key] = true;
-        if (this.keyPressed.Shift && this.keyPressed.Alt) this.changeLang(changeLang);
-        Object.values(this.keys).forEach((rowKeys) => {
-          rowKeys.forEach((key) => {
-            if (e.code === key[0][0]) key[1].classList.add('touch');
-          });
-        });
-      }
-    });
-    document.addEventListener('keyup', (e) => {
-      this.keyPressed[e.key] = false;
-      Object.values(this.keys).forEach((rowKeys) => {
-        rowKeys.forEach((key) => {
-          if (e.code === key[0][0]) {
-            key[1].classList.remove('touch');
-          }
-        });
-      });
-    });
-    $workArea.addEventListener('focusout', () => {
-      this.keyPressed = {};
-      Object.values(this.keys).forEach((rowKeys) => {
-        rowKeys.forEach((key) => {
-          key[1].classList.remove('touch');
-        });
-      });
-    });
+    this.keydown($workArea);
+    this.keyup();
+    this.focusout($workArea);
   }
 
   createRow(rowName, classRow, keys) {
