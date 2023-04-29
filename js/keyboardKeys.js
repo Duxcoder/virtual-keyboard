@@ -6,6 +6,16 @@ function renderToArea(textArea, renderKeyValue) {
   $textArea.selectionEnd = $textArea.textContent.length + renderKeyValue.length;
   $textArea.selectionStart = $textArea.textContent.length + renderKeyValue.length;
 }
+
+function doBackspace(valueKey, textArea) {
+  const $textArea = textArea;
+  if (valueKey.toLowerCase() === 'backspace') {
+    $textArea.textContent = $textArea.textContent.slice(0, -1);
+    return '';
+  }
+  return valueKey;
+}
+
 class KeyboardKeys {
   constructor() {
     this.language = 'eng';
@@ -51,7 +61,7 @@ class KeyboardKeys {
 
   doShift(valueKey) {
     let renderKey = valueKey;
-    if (valueKey === 'shift') {
+    if (valueKey.toLowerCase() === 'shift') {
       this.shift = 1;
       return '';
     }
@@ -61,7 +71,7 @@ class KeyboardKeys {
 
   doCaps(valueKey) {
     let renderKey = valueKey;
-    if (valueKey === 'caps lock') {
+    if (valueKey.toLowerCase() === 'caps lock') {
       this.caps = 1;
       return '';
     }
@@ -85,6 +95,7 @@ class KeyboardKeys {
             renderKeyValue = this.multikey(valuesKey);
             renderKeyValue = this.doShift(renderKeyValue);
             renderKeyValue = this.doCaps(renderKeyValue);
+            renderKeyValue = doBackspace(renderKeyValue, $textArea);
             renderToArea($textArea, renderKeyValue);
           }
         });
