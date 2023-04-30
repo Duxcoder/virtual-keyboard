@@ -1,21 +1,5 @@
 import createDomElement from './assets.js';
 
-function renderToArea(textArea, renderKeyValue) {
-  const $textArea = textArea;
-  $textArea.textContent += renderKeyValue;
-  $textArea.selectionEnd = $textArea.textContent.length + renderKeyValue.length;
-  $textArea.selectionStart = $textArea.textContent.length + renderKeyValue.length;
-}
-
-function doBackspace(valueKey, textArea) {
-  const $textArea = textArea;
-  if (valueKey.toLowerCase() === 'backspace') {
-    $textArea.textContent = $textArea.textContent.slice(0, -1);
-    return '';
-  }
-  return valueKey;
-}
-
 class KeyboardKeys {
   constructor() {
     this.language = 'eng';
@@ -24,6 +8,7 @@ class KeyboardKeys {
     this.keyPressed = {};
     this.shift = 0;
     this.caps = 0;
+    this.cursorPosition = 0;
   }
 
   async getKeys() {
@@ -55,6 +40,16 @@ class KeyboardKeys {
     }
   }
 
+  renderToArea(renderKeyValue, textArea) {
+    const $textArea = textArea;
+    // $textArea.textContent += renderKeyValue;
+    $textArea.textContent = $textArea.textContent.slice(0, this.cursorPosition)
+      + renderKeyValue + $textArea.textContent.slice(this.cursorPosition);
+    this.cursorPosition += renderKeyValue.length;
+    $textArea.selectionEnd = this.cursorPosition;
+    $textArea.selectionStart = this.cursorPosition;
+  }
+
   multikey(valuesKey) {
     return Array.isArray(valuesKey) ? valuesKey[this.shift] : valuesKey;
   }
@@ -79,6 +74,60 @@ class KeyboardKeys {
     return renderKey;
   }
 
+  doBackspace(valueKey, textArea) {
+    const $textArea = textArea;
+    if (valueKey.toLowerCase() === 'backspace') {
+      if (this.cursorPosition !== 0) {
+        this.cursorPosition -= 1;
+        $textArea.textContent = $textArea.textContent.slice(0, this.cursorPosition)
+          + $textArea.textContent.slice(this.cursorPosition + 1);
+      }
+      return '';
+    }
+    return valueKey;
+  }
+
+  arrows(valueKey, textArea) {
+    let renderKey = valueKey;
+    const $textArea = textArea;
+    const style = getComputedStyle($textArea);
+    const padding = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+    const border = parseFloat(style.borderLeftWidth) + parseFloat(style.borderRightWidth);
+    const widthTextArea = $textArea.clientWidth - padding - border;
+    const rows = (parseFloat(style.fontSize) * 0.60766 * $textArea.textContent.length)
+      / widthTextArea;
+    const positionCursor = (parseFloat(style.fontSize) * 0.60766 * this.cursorPosition)
+      / widthTextArea;
+    if (valueKey.toLowerCase() === '&larr;') {
+      this.cursorPosition = this.cursorPosition === 0 ? 0 : this.cursorPosition - 1;
+      renderKey = '';
+    }
+    if (valueKey.toLowerCase() === '&uarr;') {
+      renderKey = '';
+      if (rows > 1.01 && positionCursor > 1.01) {
+        this.cursorPosition = Math.floor(((positionCursor - 1) * widthTextArea)
+          / (parseFloat(style.fontSize) * 0.60766));
+      }
+    }
+    if (valueKey.toLowerCase() === '&darr;') {
+      renderKey = '';
+      if (rows > 1.01 && positionCursor < rows - 1) {
+        this.cursorPosition = Math.floor(((positionCursor + 1.01) * widthTextArea)
+          / (parseFloat(style.fontSize) * 0.60766));
+      } else {
+        this.cursorPosition = $textArea.textContent.length;
+      }
+    }
+    if (valueKey.toLowerCase() === '&rarr;') {
+      this.cursorPosition = this.cursorPosition === $textArea.textContent.length
+        ? $textArea.textContent.length : this.cursorPosition + 1;
+      renderKey = '';
+    }
+    $textArea.selectionEnd = this.cursorPosition;
+    $textArea.selectionStart = this.cursorPosition;
+    return renderKey;
+  }
+
   keydown($workArea) {
     const $textArea = $workArea.firstChild;
     document.addEventListener('keydown', (e) => {
@@ -95,8 +144,9 @@ class KeyboardKeys {
             renderKeyValue = this.multikey(valuesKey);
             renderKeyValue = this.doShift(renderKeyValue);
             renderKeyValue = this.doCaps(renderKeyValue);
-            renderKeyValue = doBackspace(renderKeyValue, $textArea);
-            renderToArea($textArea, renderKeyValue);
+            renderKeyValue = this.doBackspace(renderKeyValue, $textArea);
+            renderKeyValue = this.arrows(renderKeyValue, $textArea);
+            this.renderToArea(renderKeyValue, $textArea);
           }
         });
       }
