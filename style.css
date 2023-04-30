@@ -122,7 +122,12 @@ text-transform: uppercase;
   transform: translateY(0.2rem);
   box-shadow: 0 0 0 0 rgb(107 107 107 / 70%), inset 0px 0px 0.5rem 0.1rem #2b3d3f;
 }
-
+.key.shift {
+  color: #fff;
+}
+.key.shift span {
+  color: #ffce88;
+}
 .key-no-size {
   flex-grow: 1;
 }

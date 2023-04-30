@@ -74,17 +74,44 @@ class KeyboardKeys {
     return renderKey;
   }
 
+  doEnter(valueKey) {
+    if (valueKey.toLowerCase() === 'enter') {
+      return '\n';
+    }
+    return valueKey;
+  }
+
   doBackspace(valueKey, textArea) {
     const $textArea = textArea;
     if (valueKey.toLowerCase() === 'backspace') {
       if (this.cursorPosition !== 0) {
-        this.cursorPosition -= 1;
-        $textArea.textContent = $textArea.textContent.slice(0, this.cursorPosition)
-          + $textArea.textContent.slice(this.cursorPosition + 1);
+        const textSelected = window.getSelection().toString();
+        if (textSelected) {
+          const startSelected = $textArea.selectionStart;
+          const newTextContent = $textArea.textContent.slice(0, startSelected)
+            + $textArea.textContent.slice(startSelected + textSelected.length);
+          $textArea.textContent = newTextContent;
+          this.cursorPosition = startSelected;
+        } else {
+          this.cursorPosition -= 1;
+          $textArea.textContent = $textArea.textContent.slice(0, this.cursorPosition)
+            + $textArea.textContent.slice(this.cursorPosition + 1);
+        }
       }
       return '';
     }
     return valueKey;
+  }
+
+  doOtherKeys(valueKey) {
+    const keys = ['alt', 'ctrl', 'win', 'tab', 'esc'];
+    let renderKey = valueKey;
+    keys.forEach((key) => {
+      if (valueKey.toLowerCase() === key) {
+        renderKey = '';
+      }
+    });
+    return renderKey;
   }
 
   arrows(valueKey, textArea) {
@@ -144,7 +171,9 @@ class KeyboardKeys {
             renderKeyValue = this.multikey(valuesKey);
             renderKeyValue = this.doShift(renderKeyValue);
             renderKeyValue = this.doCaps(renderKeyValue);
+            renderKeyValue = this.doEnter(renderKeyValue);
             renderKeyValue = this.doBackspace(renderKeyValue, $textArea);
+            renderKeyValue = this.doOtherKeys(renderKeyValue);
             renderKeyValue = this.arrows(renderKeyValue, $textArea);
             this.renderToArea(renderKeyValue, $textArea);
           }
