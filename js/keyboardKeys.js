@@ -2,7 +2,7 @@ import createDomElement from './assets.js';
 
 class KeyboardKeys {
   constructor() {
-    this.language = 'eng';
+    this.language = localStorage.getItem('lang') ? localStorage.getItem('lang') : 'eng';
     this.dataKeys = null;
     this.keys = {};
     this.keyPressed = {};
@@ -29,6 +29,7 @@ class KeyboardKeys {
   changeLang(key1, key2) {
     if (key1 && key2) {
       this.language = this.language === 'rus' ? 'eng' : 'rus';
+      localStorage.setItem('lang', this.language);
       this.doSmthWithKey((item) => {
         const key = item;
         const labelKey = key[0][1][this.language];
@@ -81,6 +82,13 @@ class KeyboardKeys {
     return valueKey;
   }
 
+  doTab(valueKey) {
+    if (valueKey.toLowerCase() === 'tab') {
+      return '\t';
+    }
+    return valueKey;
+  }
+
   doBackspace(valueKey, textArea) {
     const $textArea = textArea;
     if (valueKey.toLowerCase() === 'backspace') {
@@ -103,8 +111,29 @@ class KeyboardKeys {
     return valueKey;
   }
 
+  doDelete(valueKey, textArea) {
+    const $textArea = textArea;
+    if (valueKey.toLowerCase() === 'delete') {
+      if (this.cursorPosition !== $textArea.textContent.length) {
+        const textSelected = window.getSelection().toString();
+        if (textSelected) {
+          const startSelected = $textArea.selectionStart;
+          const newTextContent = $textArea.textContent.slice(0, startSelected)
+            + $textArea.textContent.slice(startSelected + textSelected.length);
+          $textArea.textContent = newTextContent;
+          this.cursorPosition = startSelected;
+        } else {
+          $textArea.textContent = $textArea.textContent.slice(0, this.cursorPosition)
+            + $textArea.textContent.slice(this.cursorPosition + 1);
+        }
+      }
+      return '';
+    }
+    return valueKey;
+  }
+
   doOtherKeys(valueKey) {
-    const keys = ['alt', 'ctrl', 'win', 'tab', 'esc'];
+    const keys = ['alt', 'ctrl', 'win', 'esc'];
     let renderKey = valueKey;
     keys.forEach((key) => {
       if (valueKey.toLowerCase() === key) {
@@ -172,6 +201,8 @@ class KeyboardKeys {
             renderKeyValue = this.doShift(renderKeyValue);
             renderKeyValue = this.doCaps(renderKeyValue);
             renderKeyValue = this.doEnter(renderKeyValue);
+            renderKeyValue = this.doTab(renderKeyValue);
+            renderKeyValue = this.doDelete(renderKeyValue, $textArea);
             renderKeyValue = this.doBackspace(renderKeyValue, $textArea);
             renderKeyValue = this.doOtherKeys(renderKeyValue);
             renderKeyValue = this.arrows(renderKeyValue, $textArea);
@@ -213,6 +244,29 @@ class KeyboardKeys {
     this.keydown($workArea);
     this.keyup();
     this.focusout($workArea);
+    this.clickOnKeys($workArea);
+  }
+
+  clickOnKeys($workArea) {
+    const $textArea = $workArea.firstChild;
+    this.doSmthWithKey((key) => {
+      const handler = (e) => {
+        $textArea.focus();
+        const valuesKey = key[0][1][this.language];
+        let renderKeyValue = '';
+        renderKeyValue = this.multikey(valuesKey);
+        renderKeyValue = this.doShift(renderKeyValue);
+        renderKeyValue = this.doCaps(renderKeyValue);
+        renderKeyValue = this.doEnter(renderKeyValue);
+        renderKeyValue = this.doTab(renderKeyValue);
+        renderKeyValue = this.doDelete(renderKeyValue, $textArea);
+        renderKeyValue = this.doBackspace(renderKeyValue, $textArea);
+        renderKeyValue = this.doOtherKeys(renderKeyValue);
+        renderKeyValue = this.arrows(renderKeyValue, $textArea);
+        this.renderToArea(renderKeyValue, $textArea);
+      }
+      key[1].onclick = handler;
+    });
   }
 
   createRow(rowName, classRow, keys) {
