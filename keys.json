@@ -498,8 +498,8 @@
     [
       "MetaLeft",
       {
-        "rus": "win",
-        "eng": "win"
+        "rus": "cmd",
+        "eng": "cmd"
       },
       ["key-no-size"]
     ],

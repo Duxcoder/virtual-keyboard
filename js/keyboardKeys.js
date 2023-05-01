@@ -15,7 +15,7 @@ function doTab(valueKey) {
 }
 
 function doOtherKeys(valueKey) {
-  const keys = ['alt', 'ctrl', 'win', 'esc'];
+  const keys = ['alt', 'ctrl', 'cmd', 'esc'];
   let renderKey = valueKey;
   keys.forEach((key) => {
     if (valueKey.toLowerCase() === key) {
@@ -23,6 +23,21 @@ function doOtherKeys(valueKey) {
     }
   });
   return renderKey;
+}
+
+function keyFnumbers(valueKey, $key) {
+  let $renderKey = valueKey;
+  if (/^F\d+/.test(valueKey)) {
+    const span = document.createElement('span');
+    span.classList.add('f');
+    span.textContent = 'This is a function key, reassignment is not possible. Added for beauty :)';
+    $key.append(span);
+    setTimeout(() => {
+      span.style.display = 'none';
+    }, 4500);
+    $renderKey = '';
+  }
+  return $renderKey;
 }
 
 class KeyboardKeys {
@@ -84,23 +99,17 @@ class KeyboardKeys {
     if (valueKey.toLowerCase() === 'shift') {
       this.toggleShiftKey();
       this.shift = 1;
-      console.log('shift on')
       return '';
     }
-    console.log('shift key', this.shift);
     renderKey = this.shift ? renderKey.toUpperCase() : renderKey;
     return renderKey;
   }
 
-  doCaps(valueKey, $key, capsOn) {
+  doCaps(valueKey, $key) {
     let renderKey = valueKey;
     if (valueKey.toLowerCase() === 'caps lock') {
-        this.caps = this.caps === 1 ? 0 : 1;
-        $key.classList.toggle('active');
-
-        // this.caps = 0;
-        // $key.classList.remove('active');
-      // }
+      this.caps = this.caps === 1 ? 0 : 1;
+      $key.classList.toggle('active');
       return '';
     }
     renderKey = this.caps ? renderKey.toUpperCase() : renderKey;
@@ -110,19 +119,18 @@ class KeyboardKeys {
   doBackspace(valueKey, textArea) {
     const $textArea = textArea;
     if (valueKey.toLowerCase() === 'backspace') {
+      const textSelected = window.getSelection().toString();
+      if (textSelected) {
+        const startSelected = $textArea.selectionStart;
+        const newTextContent = $textArea.textContent.slice(0, startSelected)
+          + $textArea.textContent.slice(startSelected + textSelected.length);
+        $textArea.textContent = newTextContent;
+        this.cursorPosition = startSelected;
+      }
       if (this.cursorPosition !== 0) {
-        const textSelected = window.getSelection().toString();
-        if (textSelected) {
-          const startSelected = $textArea.selectionStart;
-          const newTextContent = $textArea.textContent.slice(0, startSelected)
-            + $textArea.textContent.slice(startSelected + textSelected.length);
-          $textArea.textContent = newTextContent;
-          this.cursorPosition = startSelected;
-        } else {
-          this.cursorPosition -= 1;
-          $textArea.textContent = $textArea.textContent.slice(0, this.cursorPosition)
-            + $textArea.textContent.slice(this.cursorPosition + 1);
-        }
+        this.cursorPosition -= 1;
+        $textArea.textContent = $textArea.textContent.slice(0, this.cursorPosition)
+          + $textArea.textContent.slice(this.cursorPosition + 1);
       }
       return '';
     }
@@ -209,13 +217,13 @@ class KeyboardKeys {
             let renderKeyValue = '';
             renderKeyValue = this.multikey(valuesKey);
             renderKeyValue = this.doShift(renderKeyValue);
-            const isCaps = e.getModifierState('CapsLock');
-            renderKeyValue = this.doCaps(renderKeyValue, key[1], isCaps);
+            renderKeyValue = this.doCaps(renderKeyValue, key[1]);
             renderKeyValue = doEnter(renderKeyValue);
             renderKeyValue = doTab(renderKeyValue);
             renderKeyValue = this.doDelete(renderKeyValue, $textArea);
             renderKeyValue = this.doBackspace(renderKeyValue, $textArea);
             renderKeyValue = doOtherKeys(renderKeyValue);
+            renderKeyValue = keyFnumbers(renderKeyValue, key[1]);
             renderKeyValue = this.arrows(renderKeyValue, $textArea);
             this.renderToArea(renderKeyValue, $textArea);
           }
@@ -248,10 +256,9 @@ class KeyboardKeys {
             this.shift = 0;
             this.toggleShiftKey();
           }
-          // if (valuesKey === 'caps lock') {
-          //   this.caps = 0;
-          //   key[1].classList.remove('active');
-          // }
+          if (valuesKey === 'caps lock') {
+            this.doCaps(valuesKey, key[1]);
+          }
         }
       });
     });
@@ -277,7 +284,7 @@ class KeyboardKeys {
     const $textArea = $workArea.firstChild;
     this.doSmthWithKey((item) => {
       const key = item;
-      const handler = (e) => {
+      const handler = () => {
         $textArea.focus();
         const valuesKey = key[0][1][this.language];
         let renderKeyValue = '';
@@ -289,6 +296,7 @@ class KeyboardKeys {
         renderKeyValue = this.doDelete(renderKeyValue, $textArea);
         renderKeyValue = this.doBackspace(renderKeyValue, $textArea);
         renderKeyValue = doOtherKeys(renderKeyValue);
+        renderKeyValue = keyFnumbers(renderKeyValue, key[1]);
         renderKeyValue = this.arrows(renderKeyValue, $textArea);
         this.renderToArea(renderKeyValue, $textArea);
       };
@@ -297,7 +305,6 @@ class KeyboardKeys {
         if (key[0][1][this.language] === 'shift') {
           this.shift = 0;
           this.toggleShiftKey(false);
-          console.log('shift off', this.shift, this.caps);
         }
       });
     });
