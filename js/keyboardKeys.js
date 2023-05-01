@@ -238,7 +238,9 @@ class KeyboardKeys {
             this.toggleShiftKey();
           }
           if (valuesKey === 'caps lock') {
-            this.doCaps(valuesKey, key[1]);
+            if (navigator.userAgentData.platform === 'macOS') {
+              this.doCaps(valuesKey, key[1]);g
+            }
           }
         }
       });
