@@ -239,7 +239,7 @@ class KeyboardKeys {
           }
           if (valuesKey === 'caps lock') {
             if (navigator.userAgentData.platform === 'macOS') {
-              this.doCaps(valuesKey, key[1]);g
+              this.doCaps(valuesKey, key[1]);
             }
           }
         }
