@@ -6,9 +6,7 @@ const keyboard = new Keyboard();
 keyboard.renderWrapper(document.body);
 keyboard.renderTitle('VIRTUAL KEYBOARD');
 
-// const $textArea = createDomElement('div', 'class');
 const $textArea = '<textarea name="keyboard-text" id="textarea" rows="4"></textarea>';
-// const $description = createDomElement('div', 'class')
 const $description = `<div class="description">
 <span class="title-description">Description</span>
 <ul class="description-list">
