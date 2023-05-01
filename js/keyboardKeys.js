@@ -161,33 +161,33 @@ class KeyboardKeys {
   arrows(valueKey, textArea) {
     let renderKey = valueKey;
     const $textArea = textArea;
-    const style = getComputedStyle($textArea);
-    const padding = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
-    const border = parseFloat(style.borderLeftWidth) + parseFloat(style.borderRightWidth);
-    const widthTextArea = $textArea.clientWidth - padding - border;
-    const rows = (parseFloat(style.fontSize) * 0.60766 * $textArea.textContent.length)
-      / widthTextArea;
-    const positionCursor = (parseFloat(style.fontSize) * 0.60766 * this.cursorPosition)
-      / widthTextArea;
+    // const style = getComputedStyle($textArea);
+    // const padding = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+    // const border = parseFloat(style.borderLeftWidth) + parseFloat(style.borderRightWidth);
+    // const widthTextArea = $textArea.clientWidth - padding - border;
+    // const rows = (parseFloat(style.fontSize) * 0.60766 * $textArea.textContent.length)
+    // / widthTextArea;
+    // const positionCursor = (parseFloat(style.fontSize) * 0.60766 * this.cursorPosition)
+    // / widthTextArea;
     if (valueKey.toLowerCase() === '&larr;') {
       this.cursorPosition = this.cursorPosition === 0 ? 0 : this.cursorPosition - 1;
       renderKey = '';
     }
     if (valueKey.toLowerCase() === '&uarr;') {
-      renderKey = '';
-      if (rows > 1.01 && positionCursor > 1.01) {
-        this.cursorPosition = Math.floor(((positionCursor - 1) * widthTextArea)
-          / (parseFloat(style.fontSize) * 0.60766));
-      }
+      renderKey = '↑';
+      // if (rows > 1.01 && positionCursor > 1.01) {
+      //   this.cursorPosition = Math.floor(((positionCursor - 1) * widthTextArea)
+      //     / (parseFloat(style.fontSize) * 0.60766));
+      // }
     }
     if (valueKey.toLowerCase() === '&darr;') {
-      renderKey = '';
-      if (rows > 1.01 && positionCursor < rows - 1) {
-        this.cursorPosition = Math.floor(((positionCursor + 1.01) * widthTextArea)
-          / (parseFloat(style.fontSize) * 0.60766));
-      } else {
-        this.cursorPosition = $textArea.textContent.length;
-      }
+      renderKey = '↓';
+      // if (rows > 1.01 && positionCursor < rows - 1) {
+      //   this.cursorPosition = Math.floor(((positionCursor + 1.01) * widthTextArea)
+      //     / (parseFloat(style.fontSize) * 0.60766));
+      // } else {
+      //   this.cursorPosition = $textArea.textContent.length;
+      // }
     }
     if (valueKey.toLowerCase() === '&rarr;') {
       this.cursorPosition = this.cursorPosition === $textArea.textContent.length
