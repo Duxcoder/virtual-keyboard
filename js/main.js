@@ -13,7 +13,7 @@ const $description = `<div class="description">
 <span class="title-description">Description</span>
 <ul class="description-list">
     <li class="description-item">
-        <b>Switch language:</b> Alt + Space
+        <b>Switch language:</b> Ctrl + Alt
     </li>
     <li class="description-item">
         <b>Keyboard created:</b> MacOS

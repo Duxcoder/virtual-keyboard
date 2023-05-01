@@ -5,7 +5,8 @@
       {
         "rus": "esc",
         "eng": "esc"
-      }
+      },
+      ["key-esc"]
     ],
     [
       "F1",
@@ -97,7 +98,7 @@
         "rus": "delete",
         "eng": "delete"
       },
-      ["key-no-size", "key-right"]
+      ["key-no-size", "key-right", "key-delete"]
     ]
   ],
   "numberRow": [
@@ -309,7 +310,7 @@
         "rus": "caps lock",
         "eng": "caps lock"
       },
-      ["key-no-size", "key-left"]
+      ["key-no-size", "key-left", "key-caps"]
     ],
     [
       "KeyA",
@@ -492,7 +493,7 @@
         "rus": "ctrl",
         "eng": "ctrl"
       },
-      ["key-no-size", "key-left"]
+      ["key-no-size", "key-left", "key-ctrl"]
     ],
     [
       "MetaLeft",
@@ -560,7 +561,7 @@
       {
         "rus": "&rarr;",
         "eng": "&rarr;"
-      }
+      }, ["key-right-arrow"]
     ]
   ]
 }
